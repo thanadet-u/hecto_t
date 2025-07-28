@@ -1,4 +1,4 @@
-#![warn(clippy::pedantic)]
+#![warn(clippy::pedantic, clippy::style)]
 mod editor;
 
 use editor::Editor;

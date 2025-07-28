@@ -1,39 +1,34 @@
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
-use std::io::{self, Read};
+use crossterm::event::{Event::Key, KeyCode::Char, read};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode}; // using crossterm to read and deal with events
 
 pub struct Editor {}
 
 impl Editor {
     pub fn default() -> Self {
-        Editor {} // the last line of a block is return if it doesn't ends in a ;
-        // why rust why?
+        Editor {}
     }
 
     pub fn run(&self) {
-        enable_raw_mode().unwrap();
-        for b in io::stdin().bytes() {
-            match b {
-                Ok(b) => {
-                    // if b has no error assign it to b. (b is ok)
+        if let Err(err) = self.repl() {
+            panic!("{err:#?} \r");
+        }
+        println!("Goodbye! \r\n");
+    }
 
-                    let c = b as char; // 'as' is type casting
-
-                    if c.is_control() {
-                        println!("Binary: {0:08b} ASCII: {0:#03} \r", b);
-                    } else {
-                        println!("Binary: {0:08b} ASCII: {0:#03} Character: {1:#?}\r", b, c);
-                    }
-
-                    // when read q, exits
+    fn repl(&self) -> Result<(), std::io::Error> {
+        // return Ok box with nothing in it, or return error
+        enable_raw_mode()?; // ? unwrap the result, if its an error it return the error immediately
+        loop {
+            if let Key(event) = read()? {
+                println!("{event:?} \r");
+                if let Char(c) = event.code {
                     if c == 'q' {
                         break;
                     }
                 }
-                Err(err) => {
-                    println!("Error: {}", err);
-                } // if b can unwrap then unwrap err and print
             }
         }
-        disable_raw_mode().unwrap(); // always disable raw mode
+        disable_raw_mode()?;
+        Ok(()) // if we get to this line then there should be no error so we return
     }
 }
