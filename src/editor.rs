@@ -1,6 +1,6 @@
 use crossterm::event::{Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers, read};
-mod terminal;
 
+mod terminal;
 use terminal::Terminal;
 
 pub struct Editor {
@@ -42,32 +42,36 @@ impl Editor {
                     self.should_quit = true;
                 }
                 _ => (),
+                // }
             }
         }
     }
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
+        Terminal::hide_cursor()?;
         if self.should_quit {
             Terminal::clear_screen()?;
-            println!("\r\nGoodbye!\r");
+            Terminal::print("\r\nGoodbye!\r")?;
+            Terminal::execute()?;
         } else {
             Self::draw_rows()?;
             Terminal::move_cursor(0, 0)?;
         }
+        Terminal::show_cursor()?;
+        Terminal::execute()?;
         Ok(())
     }
 
     fn draw_rows() -> Result<(), std::io::Error> {
         let row: u16 = Terminal::size()?.1;
-        // println!("Rows: {row} \r");
-        // println!("Cols: {col} \r");
         for r in 0..row {
+            Terminal::clear_line()?;
             if r == 0 {
-                print!(" \r");
+                Terminal::print(" \r")?;
             } else {
-                print!("~\r");
+                Terminal::print("~\r")?;
             }
             if r + 1 < row {
-                print!("\r\n");
+                Terminal::print("\r\n")?;
             }
         }
         Ok(())
