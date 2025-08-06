@@ -59,7 +59,7 @@ impl Editor {
             Terminal::execute()?;
         } else {
             Self::draw_rows()?;
-            Self::print_welcome()?;
+            Self::draw_welcome()?;
             Terminal::move_cursor(Coordinate { x: 0, y: 0 })?;
         }
         Terminal::show_cursor()?;
@@ -83,7 +83,7 @@ impl Editor {
         Ok(())
     }
 
-    pub fn print_welcome() -> Result<(), std::io::Error> {
+    pub fn draw_welcome() -> Result<(), std::io::Error> {
         let y_down: u16 = (Terminal::size()?.rows) / 3;
         let width: u16 = Terminal::size()?.columns;
 
